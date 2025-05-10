@@ -325,6 +325,20 @@ Integer without single quotes, e.g.
  
 preferredcontactmethodcode eq 1
 ```
+ReportLevelFilters for filtering Power BI Reports by a Table/Column with no spaces in Table/Column name
+
+```python
+Table/ColumnNames without a space in the name, e.g. 
+ 
+Reseller/Country-Region eq '@{items('Foreach')?['Country']}
+```
+ReportLevelFilters for filtering Power BI Reports by a Table/Column with spaces in Table/Column name
+
+```python
+Table/ColumnNames with a space in the name, e.g. 
+ 
+Reseller/Country_x0020_Region eq '@{items('Foreach')?['Country']}'
+```
 
 OData filter for lookups – send a notification, about record update/assign, so long as the owner is not the same as the person who did it
 
