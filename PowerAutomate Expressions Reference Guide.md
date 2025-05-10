@@ -346,3 +346,119 @@ OData filter for lookups – send a notification, about record update/assign, so
 ( _ownerid_value ne  _modifiedby_value)
 ( _ownerid_value ne _modifiedonbehalfby_value)
 ```
+## [How to use Regex in Power Automate](https://tachytelic.net/2021/04/power-automate-regex/) ##
+
+### Regex Match
+Office script accepts three parameters:
+- The string to perform the regex match on.
+- The regex pattern to use.
+- The flags to pass to the regex object.
+    
+```javascript
+{
+    "version": "0.2.0",
+    "body": "function main\n(\n  workbook: ExcelScript.Workbook,\n  searchString: string, \n  regexPattern: string, \n  regexFlags: string\n) : Array<string> {\n  let matches: Array<string> = []\n  let re = new RegExp(regexPattern, regexFlags);\n  let matchArray: Array<string> = searchString.match(re);\n  if (matchArray) {\n    for (var i = 0; i < matchArray.length; i++) {\n      matches.push(matchArray[i]);\n    }\n  }\n  return matches;\n}",
+    "description": "",
+    "parameterInfo": "{\"originalParameterOrder\":[{\"name\":\"searchString\",\"index\":0},{\"name\":\"regexPattern\",\"index\":1},{\"name\":\"regexFlags\",\"index\":2}],\"parameterSchema\":{\"type\":\"object\",\"required\":[\"searchString\",\"regexPattern\",\"regexFlags\"],\"properties\":{\"searchString\":{\"type\":\"string\"},\"regexPattern\":{\"type\":\"string\"},\"regexFlags\":{\"type\":\"string\"}}},\"returnSchema\":{\"type\":\"object\",\"properties\":{\"result\":{\"type\":\"array\",\"items\":{\"type\":\"string\"}}}}}",
+    "apiInfo": "{\"variant\":\"synchronous\",\"variantVersion\":1}"
+}
+```
+### Regex Substitute
+Office script accepts four parameters:
+- The string to perform the regex substitute on.
+- The regex pattern to use find.
+- The flags to pass to the regex object.
+- What matches will be replaced with
+
+```javascript
+{
+    "version": "0.2.0",
+    "body": "function main\n  (\n    workbook: ExcelScript.Workbook,\n    searchString: string,\n    regexPattern: string,\n    regexFlags: string,\n    replaceString?: string,\n  ) : string {\n  if (typeof (replaceString) === 'undefined') { replaceString = ''; }  \n  let re = new RegExp(regexPattern, regexFlags)\n  return searchString.replace(re, replaceString)\n}",
+    "description": "",
+    "parameterInfo": "{\"originalParameterOrder\":[{\"name\":\"searchString\",\"index\":0},{\"name\":\"regexPattern\",\"index\":1},{\"name\":\"regexFlags\",\"index\":2},{\"name\":\"replaceString\",\"index\":3}],\"parameterSchema\":{\"type\":\"object\",\"required\":[\"searchString\",\"regexPattern\",\"regexFlags\"],\"properties\":{\"searchString\":{\"type\":\"string\"},\"regexPattern\":{\"type\":\"string\"},\"regexFlags\":{\"type\":\"string\"},\"replaceString\":{\"type\":\"string\"}}},\"returnSchema\":{\"type\":\"object\",\"properties\":{\"result\":{\"type\":\"string\"}}}}",
+    "apiInfo": "{\"variant\":\"synchronous\",\"variantVersion\":1}"
+}
+```
+### [Flatten DLP JSON - Array of Arrays into a Flat Array](https://johnliu.net/blog/2025/3/flattening-an-array-of-arrays-in-power-automate)
+This Office script takes a JSON string as input (representing the Power Platform DLP policies), flattens its structure, and returns an array of simplified objects.
+
+```javascript
+interface src {
+  displayName: string;
+  connectorGroups: {
+    classification: string;
+    connectors: {
+      id: string;
+      name: string;
+      type: string;
+    }[];
+  }[];
+}
+
+interface tgt {
+  policyName: string;
+  classification: string;
+  id: string;
+  name: string;
+  type: string;
+}
+
+function main(workbook: ExcelScript.Workbook, dlpValue: string): tgt[] {
+  let dlp: src[] = JSON.parse(dlpValue);
+  return flattenDLPJson(dlp);
+}
+
+function flattenDLPJson(dlp: src[]): tgt[] {
+  let flattenedList: tgt[] = [];
+  dlp.forEach(policy => {
+    let policyName = policy.displayName;
+    policy.connectorGroups.forEach(policyGroup => {
+      let classification = policyGroup.classification;
+      policyGroup.connectors.forEach(connector => {
+        let flattenedItem: tgt = {
+          policyName: policyName,
+          classification: classification,
+          id: connector.id,
+          name: connector.name,
+          type: connector.type
+        };
+        flattenedList.push(flattenedItem);
+      });
+    });
+  });
+  return flattenedList;
+}
+```
+### Regex Patterns
+
+[Regular Expression to Find Email Addresses](https://www.regular-expressions.info/email.html) with gi flag
+```python
+\b[A-Z0-9._%+-]+@[A-Z0-9.-]+.[A-Z]{2,}\b
+```
+
+[Regular Expression to Validate Credit Card Numbers](https://www.regular-expressions.info/creditcard.html) with gi flag
+```python
+^(?:4[0-9]{12}(?:[0-9]{3})?          # Visa
+ |  (?:5[1-5][0-9]{2}                # MasterCard
+     | 222[1-9]|22[3-9][0-9]|2[3-6][0-9]{2}|27[01][0-9]|2720)[0-9]{12}
+ |  3[47][0-9]{13}                   # American Express
+ |  3(?:0[0-5]|[68][0-9])[0-9]{11}   # Diners Club
+ |  6(?:011|5[0-9]{2})[0-9]{12}      # Discover
+ |  (?:2131|1800|35\d{3})\d{11}      # JCB
+)$
+```
+
+[Regular Expression to Trim Extra Spaces within a String](https://tachytelic.net/2021/04/power-automate-regex/) with g flag
+```python
+\s\s+
+```
+
+[Regular Expression to match a date in mm/dd/yyyy format](https://www.regular-expressions.info/dates.html) with g flag
+```python
+^(0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])[- /.](19|20)\d\d$
+```
+
+[Regular Expression to match a date in dd-mm-yyyy format](https://www.regular-expressions.info/dates.html) with g flag
+```python
+^(0[1-9]|[12][0-9]|3[01])[- /.](0[1-9]|1[012])[- /.](19|20)\d\d$
+```
